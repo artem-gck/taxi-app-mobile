@@ -1,6 +1,6 @@
-﻿using Taxi_mobile.ViewModels;
+using Taxi_mobile.ViewModels;
 
-namespace Taxi_mobile;
+namespace Taxi_mobile.Views;
 
 public partial class MainPage : ContentPage
 {
@@ -8,6 +8,5 @@ public partial class MainPage : ContentPage
 	{
 		InitializeComponent();
 		BindingContext = new MainPageViewModel();
-    }
+	}
 }
-
