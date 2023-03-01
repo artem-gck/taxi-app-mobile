@@ -17,12 +17,14 @@ namespace Taxi_mobile.ViewModels
 
         public ICommand Command => new Command(async () =>
         {
-            _count++;
+            //_count++;
 
-            if (_count == 1)
-                Text = $"Clicked {_count} time";
-            else
-                Text = $"Clicked {_count} times";
+            //if (_count == 1)
+            //    Text = $"Clicked {_count} time";
+            //else
+            //    Text = $"Clicked {_count} times";
+
+            await Shell.Current.GoToAsync("/MapPage");
         });
     }
 }
