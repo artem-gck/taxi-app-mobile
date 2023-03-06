@@ -1,9 +1,12 @@
+using Taxi_mobile.ViewModels;
+
 namespace Taxi_mobile.Views;
 
 public partial class AboutUsPage : ContentPage
 {
-	public AboutUsPage()
+	public AboutUsPage(AboutUsViewModel aboutUsViewModel)
 	{
 		InitializeComponent();
-	}
+		BindingContext = aboutUsViewModel;
+    }
 }

@@ -1,12 +1,89 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:maps="clr-namespace:Taxi_mobile.Controls"
+             xmlns:beh="clr-namespace:Taxi_mobile.Behaviors"
+             xmlns:conv="clr-namespace:Taxi_mobile.Helpers.Converters"
              x:Class="Taxi_mobile.Views.AboutUsPage"
              Title="AboutUsPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="About us"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <conv:MapClickedEventArgsToLocationConverter x:Key="SelectedItemConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid>
+        
+        <maps:Map VerticalOptions="FillAndExpand"
+                  HorizontalOptions="FillAndExpand"
+                  IsShowingUser="True"
+                  MapElements="{Binding MapElements}"
+                  Pins="{Binding Pins}"
+                  MoveToRegionCommand="{Binding MoveToRegionCommand}">
+
+            <maps:Map.Behaviors>
+                
+                <beh:MapClickedBehavior Command="{Binding MapClickedCommand}" 
+                                        Converter="{StaticResource SelectedItemConverter}" />
+                
+            </maps:Map.Behaviors>
+            
+        </maps:Map>
+
+        <Image Source="ic_location_red.png"
+               IsVisible="{Binding IsRouteNotRunning}"
+               HeightRequest="35"
+               WidthRequest="35"
+               VerticalOptions="CenterAndExpand"
+               HorizontalOptions="CenterAndExpand"/>
+
+        <StackLayout BackgroundColor="White"
+                     Orientation="Horizontal"
+                     VerticalOptions="Start"
+                     Padding="10"
+                     IsVisible="{Binding IsVisibleSearchLayout}"
+                     x:Name="searchLayout"
+                     Margin="30,50,30,0">
+            
+            <Image Source="ic_search"
+                   HeightRequest="15"
+                   WidthRequest="15"/>
+            
+            <Label HorizontalOptions="FillAndExpand"
+                   LineBreakMode="TailTruncation"
+                   FontAttributes="Italic"
+                   Text="Search Place"
+                   TextColor="Gray"/>
+            
+            <StackLayout.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding EnterAddressTappedCommand}" />
+            </StackLayout.GestureRecognizers>
+            
+        </StackLayout>
+
+        <Button Text="Choose Pickup"
+                Margin="40"
+                IsVisible="{Binding IsRouteNotRunning}"
+                Command="{Binding EnterAddressTappedCommand}" 
+                x:Name="chooseLocationButton"
+                BackgroundColor="DodgerBlue"
+                TextColor="White"
+                FontSize="17"
+                VerticalOptions="EndAndExpand"
+                HorizontalOptions="FillAndExpand"/>
+
+        <Button Text="Stop"
+                Margin="40"
+                Command="{Binding StopRouteCommand}"
+                IsVisible="{Binding IsVisibleStopRouteButton}"
+                x:Name="stopRouteButton"
+                BackgroundColor="Red"
+                TextColor="White"
+                FontSize="17"
+                VerticalOptions="EndAndExpand"
+                HorizontalOptions="FillAndExpand"/>
+        
+    </Grid>
+    
 </ContentPage>
