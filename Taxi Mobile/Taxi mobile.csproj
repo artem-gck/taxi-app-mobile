@@ -52,17 +52,42 @@
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Maui.Controls.Maps" Version="7.0.59" />
+		<PackageReference Include="Mopups" Version="1.1.1" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Resources\Dictionaries\ResourcesView.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>ResourcesView.resx</DependentUpon>
+	  </Compile>
+	  <Compile Update="Resources\Dictionaries\ResourcesViewModel.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>ResourcesViewModel.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Resources\Dictionaries\ResourcesView.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>ResourcesView.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\Dictionaries\ResourcesViewModel.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>ResourcesViewModel.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Resources\Controls\Converters.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\AboutUsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\MainPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\MapPage.xaml">
+	  <MauiXaml Update="Views\Popups\InfoPopup.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\SearchPlacePage.xaml">

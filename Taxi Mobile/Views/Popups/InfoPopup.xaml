@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mopups:PopupPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                  xmlns:mopups="clr-namespace:Mopups.Pages;assembly=Mopups"
+                  x:Class="Taxi_mobile.Views.Popups.InfoPopup"
+                  CloseWhenBackgroundIsClicked="False"
+                  BackgroundColor="{StaticResource LightTransperent}">
+    
+    <ScrollView HorizontalOptions="Center"
+                VerticalOptions="Center">
+        
+        <Frame Margin="100, 100"
+               BackgroundColor="{StaticResource Secondary}"
+               HorizontalOptions="Center"
+               CornerRadius="15">
+
+            <VerticalStackLayout Spacing="3">
+
+                <Image HeightRequest="50"
+                       WidthRequest="50"
+                       Source="{Binding IsPositive, Converter={StaticResource PopupImageConverter}}"/>
+
+                <Label Text="{Binding Title}"
+                       TextColor="{StaticResource Gray600}"
+                       FontSize="22"
+                       VerticalOptions="Center" 
+                       HorizontalOptions="Center" />
+
+                <Label Text="{Binding Message}"
+                       TextColor="{StaticResource Gray600}"
+                       FontSize="18"
+                       VerticalOptions="Center" 
+                       HorizontalOptions="Center" />
+
+            </VerticalStackLayout>
+
+        </Frame>
+    </ScrollView>
+    
+</mopups:PopupPage>

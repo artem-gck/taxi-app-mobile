@@ -2,6 +2,6 @@
 {
     public interface IGeolocationService
     {
-        public Task<Location> GetCurrentLocation(GeolocationAccuracy accuracy, TimeSpan timeout);
+        public Task<Location> GetCurrentLocationAsync(GeolocationAccuracy accuracy, TimeSpan timeout);
     }
 }

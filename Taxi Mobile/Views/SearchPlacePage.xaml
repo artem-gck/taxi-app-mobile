@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:resources="clr-namespace:Taxi_mobile.Resources.Dictionaries"
              x:Class="Taxi_mobile.Views.SearchPlacePage"
-             Title="SearchPlacePage"
+             Title="{Static resources:ResourcesView.SearchPlacePageTitle}"
              FocusOriginCommand="{Binding FocusOriginCommand}">
     
     <Grid VerticalOptions="FillAndExpand"
@@ -28,8 +29,8 @@
             <Image Source="ic_search"
                    HeightRequest="20"
                    WidthRequest="20"/>
-            
-            <Entry Placeholder="Enter Pickup"
+
+            <Entry Placeholder="{Static resources:ResourcesView.EnterPickupPlaceholder}"
                    Text="{Binding PickupText}"
                    FontSize="18"
                    x:Name="originEntry"
@@ -37,7 +38,12 @@
                    FontAttributes="Italic"
                    ReturnType="Search"
                    HorizontalOptions="FillAndExpand" />
-            
+
+            <ImageButton Source="position_pin.svg"
+                         Command="{Binding ChooseMyLocationCommand}"
+                         HeightRequest="30"
+                         WidthRequest="30"/>
+
         </StackLayout>
 
         <StackLayout Grid.Row="1"
@@ -65,10 +71,9 @@
                   Grid.Row="2"
                   Footer=""
                   SelectedItem="{Binding PlaceSelected, Mode=TwoWay}"
-                  x:Name="list"
                   ItemsSource="{Binding Places}"
                   HasUnevenRows="true"
-                  SeparatorColor="Gray">
+                  SeparatorColor="{StaticResource Gray400}">
             
             <ListView.Triggers>
                 
@@ -94,14 +99,12 @@
             
             <ListView.Header>
                 
-                <StackLayout  x:Name="recentSearchText"
-                              IsVisible="{Binding IsShowRecentPlaces}">
+                <StackLayout  IsVisible="{Binding IsShowRecentPlaces}">
                     
                     <Label LineBreakMode="WordWrap"
                            FontAttributes="Bold"
                            Margin="20,10"
-                           x:Name="recentSearch"
-                           Text="History"/>
+                           Text="{Static resources:ResourcesView.HistoryTitle}"/>
                     
                 </StackLayout>
                 
@@ -139,11 +142,11 @@
                                    Text="{Binding StructuredFormatting.MainText}"
                                    Grid.Row="0"
                                    Grid.Column="1"
-                                   TextColor="Black"/>
+                                   TextColor="{StaticResource Black}"/>
 
                             <Label LineBreakMode="MiddleTruncation"
                                    Text="{Binding StructuredFormatting.SecondaryText}" 
-                                   TextColor="Gray" 
+                                   TextColor="{StaticResource Gray400}" 
                                    Grid.Row="1"
                                    Grid.Column="1"/>
                             

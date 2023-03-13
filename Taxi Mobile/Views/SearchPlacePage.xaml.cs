@@ -14,10 +14,10 @@ public partial class SearchPlacePage : ContentPage
         set { SetValue(FocusOriginCommandProperty, value); }
     }
 
-    public SearchPlacePage(AboutUsViewModel aboutUsViewModel)
+    public SearchPlacePage(SearchPlaceViewModel searchPlaceViewModel)
     {
         InitializeComponent();
-        BindingContext = aboutUsViewModel;
+        BindingContext = searchPlaceViewModel;
     }
 
     protected override void OnBindingContextChanged()

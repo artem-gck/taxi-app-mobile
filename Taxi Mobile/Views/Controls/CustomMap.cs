@@ -3,9 +3,9 @@ using Microsoft.Maui.Maps;
 using System.Windows.Input;
 using Taxi_mobile.Views;
 
-namespace Taxi_mobile.Controls
+namespace Taxi_mobile.Views.Controls
 {
-    public class Map : Microsoft.Maui.Controls.Maps.Map
+    public class CustomMap : Microsoft.Maui.Controls.Maps.Map
     {
         public static readonly BindableProperty MoveToRegionCommandProperty =
             BindableProperty.Create(nameof(MoveToRegionCommand), typeof(ICommand), typeof(AboutUsPage), null, BindingMode.TwoWay);

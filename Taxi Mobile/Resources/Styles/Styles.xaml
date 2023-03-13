@@ -2,7 +2,8 @@
 <?xaml-comp compile="true" ?>
 <ResourceDictionary 
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:maps="clr-namespace:Taxi_mobile.Views.Controls">
 
     <Style TargetType="ActivityIndicator">
         <Setter Property="Color" Value="{StaticResource Primary}" />
@@ -20,6 +21,21 @@
         <Setter Property="Padding" Value="14,10"/>
         <Setter Property="MinimumHeightRequest" Value="44"/>
         <Setter Property="MinimumWidthRequest" Value="44"/>
+    </Style>
+
+    <Style TargetType="Button" x:Key="BottomButton">
+        <Setter Property="TextColor" Value="{StaticResource White}" />
+        <Setter Property="Margin" Value="40" />
+        <Setter Property="FontFamily" Value="OpenSansRegular"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="VerticalOptions" Value="EndAndExpand"/>
+        <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
+    </Style>
+
+    <Style TargetType="maps:CustomMap">
+        <Setter Property="IsShowingUser" Value="True" />
+        <Setter Property="VerticalOptions" Value="FillAndExpand" />
+        <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
     </Style>
 
     <!--<Style TargetType="Border">
