@@ -1,6 +1,7 @@
 ﻿using Microsoft.Maui.Controls.Maps;
 using Microsoft.Maui.Maps;
 using System.Windows.Input;
+using Taxi_mobile.Models.Map;
 using Taxi_mobile.Views;
 
 namespace Taxi_mobile.Views.Controls

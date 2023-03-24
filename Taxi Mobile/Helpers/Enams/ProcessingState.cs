@@ -6,6 +6,7 @@
         SelectingDriver,
         StartOrder,
         Waiting, 
+        EndOfWaiting,
         Processing, 
         EndRoad
     }

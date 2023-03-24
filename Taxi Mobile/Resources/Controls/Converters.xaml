@@ -5,6 +5,7 @@
                     xmlns:conv="clr-namespace:Taxi_mobile.Helpers.Converters">
 
     <conv:MapClickedEventArgsToLocationConverter x:Key="SelectedItemConverter" />
+    <conv:TimeSpanToStringConverter x:Key="TimeSpanConverter"/>
     <conv:BoolToImageConverter x:Key="PopupImageConverter" 
                                PositiveImagePath="positive_info_popup.svg"
                                NegativeImagePath="negative_info_popup.svg" />

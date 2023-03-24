@@ -1,4 +1,6 @@
-﻿namespace Taxi_mobile;
+﻿using Plugin.LocalNotification;
+
+namespace Taxi_mobile;
 
 public partial class App : Application
 {

@@ -5,7 +5,7 @@
              x:Class="Taxi_mobile.Views.SearchPlacePage"
              Title="{Static resources:ResourcesView.SearchPlacePageTitle}"
              FocusOriginCommand="{Binding FocusOriginCommand}">
-    
+
     <Grid VerticalOptions="FillAndExpand"
           BackgroundColor="White"
           RowSpacing="0"
@@ -124,7 +124,7 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            
+
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>

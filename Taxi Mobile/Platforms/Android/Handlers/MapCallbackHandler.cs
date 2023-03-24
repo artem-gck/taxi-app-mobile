@@ -15,9 +15,14 @@ namespace Taxi_mobile.Views.Handlers
 
         public void OnMapReady(GoogleMap googleMap)
         {
+
             if (googleMap is not null)
             {
-                //googleMap.UiSettings.ZoomControlsEnabled = false;
+#if DEBUG
+                googleMap.UiSettings.ZoomControlsEnabled = true;
+#else
+                googleMap.UiSettings.ZoomControlsEnabled = false;
+#endif
             }
 
             mapHandler.UpdateValue(nameof(IMap.Pins));

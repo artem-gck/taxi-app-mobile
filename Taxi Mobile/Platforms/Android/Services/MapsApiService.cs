@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
-using Taxi_mobile.Models;
 using Taxi_mobile.Interfaces.Platforms;
 using Taxi_mobile.Platforms.Android.Helpers;
+using Taxi_mobile.Models.GoogleMaps;
 
 namespace Taxi_mobile.Services.Platforms
 {

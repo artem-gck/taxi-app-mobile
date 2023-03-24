@@ -117,20 +117,44 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ChooseCar" xml:space="preserve">
+    <value>Choose car</value>
+  </data>
   <data name="ChoosePickup" xml:space="preserve">
     <value>Choose Pickup</value>
+  </data>
+  <data name="DistanceField" xml:space="preserve">
+    <value>Distance</value>
+  </data>
+  <data name="EndRoad" xml:space="preserve">
+    <value>End Road</value>
   </data>
   <data name="EnterPickupPlaceholder" xml:space="preserve">
     <value>Enter Pickup</value>
   </data>
+  <data name="ExperienceField" xml:space="preserve">
+    <value>Experience</value>
+  </data>
   <data name="HistoryTitle" xml:space="preserve">
     <value>History</value>
+  </data>
+  <data name="NameField" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="OrderTitle" xml:space="preserve">
+    <value>Order</value>
+  </data>
+  <data name="RaitingField" xml:space="preserve">
+    <value>Raiting</value>
   </data>
   <data name="SearchPlace" xml:space="preserve">
     <value>Search Place</value>
   </data>
   <data name="SearchPlacePageTitle" xml:space="preserve">
     <value>Search place</value>
+  </data>
+  <data name="StartRide" xml:space="preserve">
+    <value>Start ride</value>
   </data>
   <data name="Stop" xml:space="preserve">
     <value>Stop</value>

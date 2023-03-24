@@ -4,7 +4,7 @@ using Taxi_mobile.Helpers;
 using Taxi_mobile.Infrastructure;
 using Taxi_mobile.Interfaces;
 using Taxi_mobile.Interfaces.Platforms;
-using Taxi_mobile.Models;
+using Taxi_mobile.Models.GoogleMaps;
 using Taxi_mobile.Resources.Dictionaries;
 
 namespace Taxi_mobile.ViewModels
@@ -181,7 +181,9 @@ namespace Taxi_mobile.ViewModels
 
                         var navigationParameter = new Dictionary<string, object>
                         {
-                            { "positions", positions }
+                            { "positions", positions },
+                            { "origin", _origin },
+                            { "destination", _destination }
                         };
 
                         await Shell.Current.GoToAsync($"..", navigationParameter);

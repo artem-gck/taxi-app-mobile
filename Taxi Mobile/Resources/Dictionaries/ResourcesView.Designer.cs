@@ -61,11 +61,38 @@ namespace Taxi_mobile.Resources.Dictionaries {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Choose car.
+        /// </summary>
+        internal static string ChooseCar {
+            get {
+                return ResourceManager.GetString("ChooseCar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Choose Pickup.
         /// </summary>
         internal static string ChoosePickup {
             get {
                 return ResourceManager.GetString("ChoosePickup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Distance.
+        /// </summary>
+        internal static string DistanceField {
+            get {
+                return ResourceManager.GetString("DistanceField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to End Road.
+        /// </summary>
+        internal static string EndRoad {
+            get {
+                return ResourceManager.GetString("EndRoad", resourceCulture);
             }
         }
         
@@ -79,11 +106,47 @@ namespace Taxi_mobile.Resources.Dictionaries {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Experience.
+        /// </summary>
+        internal static string ExperienceField {
+            get {
+                return ResourceManager.GetString("ExperienceField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to History.
         /// </summary>
         internal static string HistoryTitle {
             get {
                 return ResourceManager.GetString("HistoryTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name.
+        /// </summary>
+        internal static string NameField {
+            get {
+                return ResourceManager.GetString("NameField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Order.
+        /// </summary>
+        internal static string OrderTitle {
+            get {
+                return ResourceManager.GetString("OrderTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Raiting.
+        /// </summary>
+        internal static string RaitingField {
+            get {
+                return ResourceManager.GetString("RaitingField", resourceCulture);
             }
         }
         
@@ -102,6 +165,15 @@ namespace Taxi_mobile.Resources.Dictionaries {
         internal static string SearchPlacePageTitle {
             get {
                 return ResourceManager.GetString("SearchPlacePageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start ride.
+        /// </summary>
+        internal static string StartRide {
+            get {
+                return ResourceManager.GetString("StartRide", resourceCulture);
             }
         }
         

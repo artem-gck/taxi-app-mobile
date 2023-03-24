@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
-using Microsoft.Maui.Controls.Maps;
 
 namespace Taxi_mobile.Helpers
 {
     public static class PolylineHelper
     {
-        /// <summary>
-        /// Decode google style polyline coordinates.
-        /// </summary>
-        /// <param name="encodedPoints"></param>
-        /// <returns></returns>
         public static IEnumerable<Location> Decode(string encodedPoints)
         {
             if (string.IsNullOrEmpty(encodedPoints))
@@ -63,11 +56,30 @@ namespace Taxi_mobile.Helpers
             }
         }
 
-        /// <summary>
-        /// Encode it
-        /// </summary>
-        /// <param name="points"></param>
-        /// <returns></returns>
+        public static double ColculateDistance(IEnumerable<Location> points, DistanceUnits units)
+        {
+            Location priviosLocation = null;
+            var distance = 0d;
+
+            foreach (var point in points)
+            {
+                if (priviosLocation is null)
+                {
+                    priviosLocation = point;
+                }
+                else
+                {
+                    var newLocation = point;
+
+                    distance += newLocation.CalculateDistance(priviosLocation, units);
+
+                    priviosLocation = newLocation;
+                }
+            }
+
+            return distance;
+        }
+
         public static string Encode(IEnumerable<Location> points)
         {
             var str = new StringBuilder();

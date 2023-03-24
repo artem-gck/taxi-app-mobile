@@ -1,11 +1,14 @@
 ﻿using Microsoft.Maui.Controls.Maps;
 using Microsoft.Maui.Maps;
-using System.Runtime.CompilerServices;
+using System.Linq;
+using System.Web;
 using System.Windows.Input;
+using Taxi_mobile.Helpers;
 using Taxi_mobile.Helpers.Enams;
 using Taxi_mobile.Infrastructure;
 using Taxi_mobile.Interfaces;
 using Taxi_mobile.Interfaces.Platforms;
+using Taxi_mobile.Models.Api;
 using Taxi_mobile.Views.Controls;
 using Polyline = Microsoft.Maui.Controls.Maps.Polyline;
 
@@ -16,14 +19,21 @@ namespace Taxi_mobile.ViewModels
         public ICommand StopRouteCommand { get; set; }
         public ICommand EnterAddressTappedCommand => new Command(async () =>
         {
-            _processingService.OnCurrentStateChanged -= Initialize;
+            _processingService.OnCurrentStateChanged -= InitializeUi;
             await Shell.Current.GoToAsync("/SearchPlacePage");
         });
-    
         public ICommand MapClickedCommand { get; set; }
         public ICommand MoveToRegionCommand { get; set; }
         public ICommand GetActualLocationCommand { get; set; }
+        public ICommand AddOrderCommand { get; set; }
+        public ICommand StartRideCommand { get; set; }
+        public ICommand EndRoadCommand { get; set; }
 
+        public double DistanceFromUserToPoint { get => _distanceFromUserToPoint; set => SetProperty(ref _distanceFromUserToPoint, value); }
+        public DriverResponse SelectedDriver { get => _selectedDriver; set => SetProperty(ref _selectedDriver, value); }
+        public bool IsChoosCar { get => _isChooseCar; set => SetProperty(ref _isChooseCar, value); }
+        public bool IsRoadEnd { get => _isRoadEnd; set => SetProperty(ref _isRoadEnd, value); }
+        public bool IsWaiting { get => _isWaiting; set => SetProperty(ref _isWaiting, value); }
         public bool IsRouteNotRunning { get => _isRouteNotRunning; set => SetProperty(ref _isRouteNotRunning, value); }
         public bool IsVisibleDriverLayout { get => _isVisibleDriverLayout; set => SetProperty(ref _isVisibleDriverLayout, value); }
         public bool IsVisibleSearchLayout { get => _isVisibleSearchLayout; set => SetProperty(ref _isVisibleSearchLayout, value); }
@@ -35,7 +45,19 @@ namespace Taxi_mobile.ViewModels
         private readonly IPopupService _popupService;
         private readonly IWebService _webService;
         private readonly IProcessingService _processingService;
+        private readonly IMapsApiService _mapsApiService;
 
+        private Polyline _originDirection;
+        private List<Location> _originPositions;
+        private double _distanceFromUserToPoint;
+        private Guid _originPinId;
+        private Guid _destinationPinId;
+        private Location _origin;
+        private Location _destination;
+        private DriverResponse _selectedDriver;
+        private bool _isChooseCar;
+        private bool _isRoadEnd;
+        private bool _isWaiting;
         private bool _isRouteNotRunning;
         private bool _isVisibleDriverLayout;
         private bool _isVisibleSearchLayout;
@@ -43,20 +65,22 @@ namespace Taxi_mobile.ViewModels
         private IList<MapElement> _mapElements;
         private IList<Pin> _pins;
         
-
-        public AboutUsViewModel(IGeolocationService geolocationService, IPlatformService platformService, IPopupService popupService, IWebService webService, IProcessingService processingService)
+        public AboutUsViewModel(IGeolocationService geolocationService, IPlatformService platformService, IPopupService popupService, IWebService webService, IProcessingService processingService, IMapsApiService mapsApiService)
             : base(platformService)
         {
             _geolocationService = geolocationService;
             _popupService = popupService;
             _webService = webService;
             _processingService = processingService;
-            
-            StopRouteCommand = new Command(StopRoute);
-            MapClickedCommand = new Command<Location>(Click);
+            _mapsApiService = mapsApiService;
 
-            _processingService.OnCurrentStateChanged += Initialize;
-            _processingService.SetNotActiveState();
+            StopRouteCommand = new Command(StopRoute);
+            MapClickedCommand = new Command<Location>(ClickOnMap);
+            AddOrderCommand = new Command(AddOrder);
+            StartRideCommand = new Command(StartRide);
+            EndRoadCommand = new Command(async () => await EndRoad());
+
+            _processingService.OnCurrentStateChanged += InitializeUi;
 
             Initialize();
         }
@@ -74,28 +98,123 @@ namespace Taxi_mobile.ViewModels
             MapSpan mapSpan = MapSpan.FromCenterAndRadius(location, Distance.FromMeters(100));
             MoveToRegionCommand.Execute(mapSpan);
 
-            await AddRandomRiders();
+            await _processingService.Initialize();
+
+            await AddDrivers();
         }
 
-        private async Task Initialize(ProcessingState status)
+        private void InitializeUi(ProcessingState status)
         {
             switch (status)
             {
                 case ProcessingState.NotActive:
                     {
+                        IsChoosCar = false;
+                        IsWaiting = false;
                         IsVisibleDriverLayout = false;
                         IsVisibleSearchLayout = true;
                         IsVisibleStopRouteButton = false;
                         IsRouteNotRunning = true;
+                        IsRoadEnd = false;
+
+                        if (Pins is not null)
+                        {
+                            foreach (var driver in Pins)
+                            {
+                                if (driver is DriverPin)
+                                {
+                                    driver.MarkerClicked += OnDriverClick;
+                                }
+                            }
+                        }
                     }
                     break;
 
                 case ProcessingState.SelectingDriver:
                     {
+                        IsChoosCar = true;
+                        IsWaiting = false;
+                        IsVisibleDriverLayout = false;
+                        IsVisibleSearchLayout = false;
+                        IsVisibleStopRouteButton = false;
+                        IsRouteNotRunning = false;
+                        IsRoadEnd = false;
+
+                        foreach (var driver in Pins)
+                        {
+                            if (driver is DriverPin)
+                            {
+                                driver.MarkerClicked += OnDriverClick;
+                            }
+                        }
+                    }
+                    break;
+
+                case ProcessingState.StartOrder:
+                    {
+                        IsChoosCar = false;
+                        IsWaiting = false;
                         IsVisibleDriverLayout = true;
                         IsVisibleSearchLayout = false;
                         IsVisibleStopRouteButton = false;
                         IsRouteNotRunning = false;
+                        IsRoadEnd = false;
+                    }
+                    break;
+
+                case ProcessingState.Waiting:
+                    {
+                        IsChoosCar = false;
+                        IsWaiting = false;
+                        IsVisibleDriverLayout = false;
+                        IsVisibleSearchLayout = false;
+                        IsVisibleStopRouteButton = false;
+                        IsRouteNotRunning = false;
+                        IsRoadEnd = false;
+
+                        foreach (var driver in Pins)
+                        {
+                            if (driver is DriverPin)
+                            {
+                                driver.MarkerClicked -= OnDriverClick;
+                            }
+                        }
+                    }
+                    break;
+
+                case ProcessingState.EndOfWaiting:
+                    {
+                        IsChoosCar = false;
+                        IsWaiting = true;
+                        IsVisibleDriverLayout = false;
+                        IsVisibleSearchLayout = false;
+                        IsVisibleStopRouteButton = false;
+                        IsRouteNotRunning = false;
+                        IsRoadEnd = false;
+                    }
+                    break;
+
+                case ProcessingState.Processing:
+                    {
+                        IsChoosCar = false;
+                        IsWaiting = false;
+                        IsVisibleDriverLayout = false;
+                        IsVisibleSearchLayout = false;
+                        IsVisibleStopRouteButton = false;
+                        IsRouteNotRunning = false;
+                        IsRoadEnd = false;
+                    }
+                    break;
+
+                case ProcessingState.EndRoad:
+                    {
+                        IsChoosCar = false;
+                        IsWaiting = false;
+                        IsVisibleDriverLayout = false;
+                        IsVisibleSearchLayout = false;
+                        IsVisibleStopRouteButton = false;
+                        IsRouteNotRunning = false;
+                        IsRoadEnd = true;
                     }
                     break;
             }
@@ -103,141 +222,204 @@ namespace Taxi_mobile.ViewModels
 
         public override void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            _processingService.OnCurrentStateChanged += Initialize;
+            _processingService.OnCurrentStateChanged += InitializeUi;
 
             if (query != null)
             {
-                var locations = query["positions"] as List<Location>;
+                _originPositions = query["positions"] as List<Location>;
+                _origin = query["origin"] as Location;
+                _destination = query["destination"] as Location;
 
-                CalculateRoute(locations);
+                CalculateRoute(_originPositions);
 
-                IsRouteNotRunning = true;
+                DistanceFromUserToPoint = PolylineHelper.ColculateDistance(_originPositions, DistanceUnits.Kilometers);
 
-                foreach (var driver in Pins)
-                {
-                    if (driver is DriverPin)
-                    {
-                        driver.MarkerClicked += OnDriverClick;
-                    }
-                }
+                _processingService.SetSelectingDriverState();
             }
         }
 
 
-        private async Task AddRandomRiders()
+        private async void AddOrder()
         {
-            var drivers = await _webService.GetAllDrivers("Free");
-
-            var driverPins = new List<DriverPin>();
-
-            driverPins.Add(new DriverPin()
+            var addOrderRequest = new AddOrderRequest()
             {
-                Label = "Driver",
-                Type = PinType.Place,
-                DriverId = drivers.Drivers[0].Id,
-                ImageSource = ImageSource.FromFile("car_pin.svg"),
-                Location = new Location(drivers.Drivers[0].Latitude, drivers.Drivers[0].Longitude)
-            });
+                UserId = AppConstants.UserId,
+                DriverId = SelectedDriver.Id,
+                StartLatitude = _origin.Latitude,
+                StartLongitude = _origin.Longitude,
+                FinishLatitude = _destination.Latitude,
+                FinishLongitude = _destination.Longitude,
+            };
 
-            driverPins.Add(new DriverPin()
+            IsBusy = true;
+
+            await _processingService.SetWaitingState(addOrderRequest);
+
+            var directions = await _mapsApiService.GetDirections(new Location(SelectedDriver.Latitude, SelectedDriver.Longitude), _origin);
+            var positions = Enumerable.ToList(PolylineHelper.Decode(directions.Routes.First().OverviewPolyline.Points));
+
+            var polyline = new Polyline();
+
+            foreach (var p in positions)
             {
-                Label = "Driver",
-                Type = PinType.Place,
-                DriverId = drivers.Drivers[1].Id,
-                ImageSource = ImageSource.FromFile("car_pin.svg"),
-                Location = new Location(drivers.Drivers[1].Latitude, drivers.Drivers[1].Longitude)
-            });
+                polyline.Add(p);
+            }
 
-            driverPins.Add(new DriverPin()
-            {
-                Label = "Driver",
-                Type = PinType.Place,
-                DriverId = drivers.Drivers[2].Id,
-                ImageSource = ImageSource.FromFile("car_pin.svg"),
-                Location = new Location(drivers.Drivers[2].Latitude, drivers.Drivers[2].Longitude)
-            });
+            MapElements.Remove(_originDirection);
+            MapElements.Add(polyline);
 
-            foreach (var driver in driverPins)
-                Pins.Add(driver);
+            IsBusy = false;
+
+            await LoadRoute(positions, polyline);
         }
 
-        private void OnDriverClick(object sender, PinClickedEventArgs e)
+        private void ClickOnMap(Location location)
         {
-            var send = sender as DriverPin;
+            var state = _processingService.CurrentState;
 
-            _processingService.SetSelectingDriverState();
-        }
-
-        private void Click(Location location)
-        {
-            var a = location;
-
-            if (_isVisibleDriverLayout)
+            if (state == ProcessingState.SelectingDriver || state == ProcessingState.StartOrder)
             {
+                MapElements.Clear();
+
+                var cPin = Pins.Where(p => p is CustomPin)
+                           .Cast<CustomPin>()
+                           .Where(p => p.Id == _originPinId || p.Id == _destinationPinId)
+                           .ToArray();
+
+
+                Pins.Remove(cPin[0]);
+                Pins.Remove(cPin[1]);
+
                 _processingService.SetNotActiveState();
             }
         }
 
-        //public async Task LoadRoute()
-        //{
-        //    var positionIndex = 1;
-        //    var googleDirection = await _mapsApiService.GetDirections(_origin, _destination);
-        //    if (googleDirection.Routes != null && googleDirection.Routes.Count > 0)
-        //    {
-        //        var positions = (Enumerable.ToList(PolylineHelper.Decode(googleDirection.Routes.First().OverviewPolyline.Points)));
-        //        //Map.CalculateCommand.Execute(positions);
-        //                                //CalculateRouteCommand.Execute(positions);
-        //                                CalculateRoute(positions);
-        //        _hasRouteRunning = true;
+        private async void StartRide()
+        {
+            IsBusy = true;
 
-        //        //Location tracking simulation
-        //        //Device.StartTimer(TimeSpan.FromSeconds(1), () =>
-        //        //{
-        //        //    if (positions.Count > positionIndex && _hasRouteRunning)
-        //        //    {
-        //        //        UpdatePosition(positions[positionIndex]);
-        //        //        //UpdatePositionCommand.Execute(positions[positionIndex]);
-        //        //        positionIndex++;
-        //        //        return true;
-        //        //    }
-        //        //    else
-        //        //    {
-        //        //        return false;
-        //        //    }
-        //        //});
-        //    }
-        //    else
-        //    {
-        //        await _alertService.DisplayAlert(":(", "No route found", "Ok");
-        //    }
+            await _processingService.SetProcessingState();
 
-        //}
+            var cPin = Pins.Where(p => p is DriverPin)
+                           .Cast<DriverPin>()
+                           .FirstOrDefault(p => p.DriverId == _selectedDriver.Id);
 
-        //private async void UpdatePosition(Location position)
-        //{
-        //    if (Pins.Count == 1 && MapElements != null && MapElements?.Count > 1)
-        //        return;
+            Pins.Clear();
+            Pins.Add(cPin);
 
-        //    var cPin = Pins.FirstOrDefault();
+            MapElements.Clear();
+            MapElements.Add(_originDirection);
 
-        //    if (cPin != null)
-        //    {
-        //        cPin.Location = new Location(position.Latitude, position.Longitude);
+            IsBusy = false;
 
-        //        //cPin.Icon = (Device.RuntimePlatform == Device.Android) ? BitmapDescriptorFactory.FromBundle("ic_taxi.png") : BitmapDescriptorFactory.FromView(new Image() { Source = "ic_taxi.png", WidthRequest = 25, HeightRequest = 25 });
-        //        var mapSpan = MapSpan.FromCenterAndRadius(new Location(position.Latitude, position.Longitude), Distance.FromKilometers(5));
-        //        MoveToRegionCommand.Execute(mapSpan);
-        //        //var previousPosition = MapElements?.FirstOrDefault();
-        //        //Polylines?.FirstOrDefault()?.Positions?.Remove(previousPosition.Value);
-        //    }
-        //    else
-        //    {
-        //        //END TRIP
-        //        MapElements?.Clear();
-        //    }
+            await LoadRoute(_originPositions, _originDirection);
+        }
 
+        private async Task EndRoad()
+        {
+            IsBusy = true;
 
-        //}
+            var request = new FinishCarRequest()
+            {
+                Price = 2,
+                Duration = 2,
+                Distance = 2
+            };
+
+            await _processingService.SetNotActiveState(request);
+
+            await AddDrivers();
+
+            IsBusy = false;
+
+            var location = await _geolocationService.GetCurrentLocationAsync(GeolocationAccuracy.Default, TimeSpan.FromSeconds(10));
+            MapSpan mapSpan = MapSpan.FromCenterAndRadius(location, Distance.FromMeters(100));
+            MoveToRegionCommand.Execute(mapSpan);
+        }
+
+        private void OnDriverClick(object sender, PinClickedEventArgs e)
+        {
+            var pin = sender as DriverPin;
+
+            var driver = new DriverResponse()
+            {
+                Id = pin.DriverId,
+                Name = pin.Name,
+                Surname = pin.Surname,
+                Raiting = pin.Raiting,
+                Experience = pin.Experience,
+                Latitude = pin.Location.Latitude,
+                Longitude = pin.Location.Longitude,
+            };
+
+            SelectedDriver = driver;
+
+            _processingService.SetStartOrderState();
+        }
+
+        private async Task LoadRoute(List<Location> positions, Polyline polyline)
+        {
+            var positionIndex = 1;
+
+            Device.StartTimer(TimeSpan.FromSeconds(1), () =>
+            {
+                if (positions.Count > positionIndex)
+                {
+                    UpdatePosition(positions[positionIndex], polyline);
+                    positionIndex++;
+
+                    return true;
+                }
+                else
+                {
+                    var task = _processingService.CurrentState switch
+                    {
+                        ProcessingState.Waiting => _processingService.SetEndOfWaiting(),
+                        ProcessingState.Processing => _processingService.SetEndRoadState()
+                    };
+
+                    task.Wait();
+
+                    return false;
+                }
+            });
+        }
+
+        private async void UpdatePosition(Location position, Polyline polyline)
+        {
+            if (Pins.Count == 1 && MapElements != null && MapElements?.Count > 1)
+                return;
+
+            var cPin = Pins.Where(p => p is DriverPin).Cast<DriverPin>().FirstOrDefault(p => p.DriverId == SelectedDriver.Id);
+
+            if (cPin != null)
+            {
+                var newPin = new DriverPin() {
+                    Location = new Location(position.Latitude, position.Longitude),
+                    DriverId = cPin.DriverId,
+                    Raiting = cPin.Raiting,
+                    Name = cPin.Name,
+                    Surname = cPin.Surname,
+                    Experience = cPin.Experience,
+                    ImageSource = ImageSource.FromFile("car_pin.svg"),
+                    Type = PinType.Place,
+                    Label = "Driver",
+                    Address = "Driver",
+                };
+
+                Pins.Remove(cPin);
+                Pins.Add(newPin);
+
+                var mapSpan = MapSpan.FromCenterAndRadius(new Location(position.Latitude, position.Longitude), Distance.FromMeters(200));
+                MoveToRegionCommand.Execute(mapSpan);
+
+                polyline.Remove(polyline.FirstOrDefault());
+            }
+            else
+            {
+                MapElements?.Clear();
+            }
+        }
 
         private void CalculateRoute(List<Location> positions)
         {
@@ -253,6 +435,8 @@ namespace Taxi_mobile.ViewModels
                 polyline.Add(p);
             }
 
+            _originDirection = polyline;
+
             MapElements.Add(polyline);
 
             MoveToRegionCommand.Execute(MapSpan.FromCenterAndRadius(new Location(polyline.First().Latitude, polyline.First().Longitude), Distance.FromMeters(200)));
@@ -267,7 +451,9 @@ namespace Taxi_mobile.ViewModels
             };
 
             Pins.Add(pin);
-            
+
+            _originPinId = pin.Id;
+
             var pin1 = new CustomPin
             {
                 Type = PinType.Place,
@@ -278,17 +464,40 @@ namespace Taxi_mobile.ViewModels
             };
             
             Pins.Add(pin1);
+
+            _destinationPinId = pin1.Id;
         }
 
-        public void StopRoute()
+        private void StopRoute()
         {
             IsVisibleSearchLayout = true;
             IsVisibleStopRouteButton = false;
 
             MapElements.Clear();
             Pins.Clear();
+        }
 
-            //_hasRouteRunning = false;
+        private async Task AddDrivers()
+        {
+            Pins.Clear();
+
+            var drivers = await _webService.GetAllDrivers("Free");
+
+            foreach (var driver in drivers.Drivers)
+            {
+                Pins.Add(new DriverPin()
+                {
+                    Label = "Driver",
+                    Type = PinType.Place,
+                    ImageSource = ImageSource.FromFile("car_pin.svg"),
+                    Location = new Location(driver.Latitude, driver.Longitude),
+                    DriverId = driver.Id,
+                    Name = driver.Name,
+                    Surname = driver.Surname,
+                    Raiting = driver.Raiting,
+                    Experience = driver.Experience,
+                });
+            }
         }
     }
 }

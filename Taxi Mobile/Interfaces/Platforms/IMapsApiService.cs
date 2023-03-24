@@ -1,4 +1,4 @@
-﻿using Taxi_mobile.Models;
+﻿using Taxi_mobile.Models.GoogleMaps;
 
 namespace Taxi_mobile.Interfaces.Platforms
 {

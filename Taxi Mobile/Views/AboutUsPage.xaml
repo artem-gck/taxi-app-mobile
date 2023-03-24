@@ -14,21 +14,22 @@
         <maps:CustomMap MapElements="{Binding MapElements}"
                         Pins="{Binding Pins}"
                         MoveToRegionCommand="{Binding MoveToRegionCommand}">
-
             <maps:CustomMap.Behaviors>
                 
                 <beh:MapClickedBehavior Command="{Binding MapClickedCommand}" 
                                         Converter="{StaticResource SelectedItemConverter}" />
                 
             </maps:CustomMap.Behaviors>
-            
         </maps:CustomMap>
+
+        <ActivityIndicator Margin="20"
+                           Color="Black" 
+                           IsRunning="{Binding IsBusy}"/>
 
         <StackLayout VerticalOptions="Start"
                      Margin="40, 50, 40, 0"
                      BackgroundColor="{StaticResource Transperent}"
                      IsVisible="{Binding IsVisibleSearchLayout}">
-
             <Frame CornerRadius="10"
                    Padding="0"
                    BackgroundColor="{StaticResource Secondary}"
@@ -55,36 +56,118 @@
                 </Frame.GestureRecognizers>
 
             </Frame>
-
         </StackLayout>
 
         <Border Padding="0"
                 VerticalOptions="End"
                 BackgroundColor="{StaticResource Secondary}"
-                HeightRequest="200"
+                x:Name="driverMenuBorder"
                 IsVisible="{Binding IsVisibleDriverLayout}">
 
             <Border.StrokeShape>
-
                 <RoundRectangle CornerRadius="20,20,0,0" />
-
             </Border.StrokeShape>
 
             <StackLayout Margin="0" 
                          Padding="30"
                          VerticalOptions="FillAndExpand">
 
-                <Button Text="Order" 
-                        VerticalOptions="EndAndExpand"/>
+                <StackLayout Orientation="Vertical">
+                    <Label FontSize="14" 
+                           TextColor="{StaticResource Gray600}" 
+                           Text="{Static resources:ResourcesView.NameField}"
+                           Margin="0, 0, 10, 0"/>
+
+                    <Label FontSize="16" 
+                           TextColor="{StaticResource Black}">
+                        <Label.Text>
+                            <MultiBinding StringFormat="{}{0} {1}">
+                                <Binding Path="SelectedDriver.Name" />
+                                <Binding Path="SelectedDriver.Surname" />
+                            </MultiBinding>
+                        </Label.Text>
+                    </Label>
+                </StackLayout>
+
+                <BoxView Color="{StaticResource Gray200}"
+                         HorizontalOptions="FillAndExpand"
+                         HeightRequest="1"
+                         Margin="0, 5"/>
+
+                <StackLayout Orientation="Vertical">
+                    <Label FontSize="14" 
+                           TextColor="{StaticResource Gray600}" 
+                           Text="{Static resources:ResourcesView.ExperienceField}"
+                           Margin="0, 0, 10, 0"/>
+
+                    <Label FontSize="16" 
+                           TextColor="Black"
+                           Text="{Binding Path=SelectedDriver.Experience, Converter={StaticResource TimeSpanConverter}}"/>
+                </StackLayout>
+
+                <BoxView Color="{StaticResource Gray200}"
+                         HorizontalOptions="FillAndExpand"
+                         HeightRequest="1"
+                         Margin="0, 5"/>
+
+                <StackLayout Orientation="Vertical">
+                    <Label FontSize="14" 
+                           TextColor="{StaticResource Gray600}" 
+                           Text="{Static resources:ResourcesView.RaitingField}"
+                           Margin="0, 0, 10, 0"/>
+
+                    <Label FontSize="16" 
+                           TextColor="Black"
+                           Text="{Binding Path=SelectedDriver.Raiting, StringFormat='{0:F2}'}"/>
+                </StackLayout>
+
+                <BoxView Color="{StaticResource Gray200}"
+                         HorizontalOptions="FillAndExpand"
+                         HeightRequest="1"
+                         Margin="0, 5"/>
+
+                <StackLayout Orientation="Vertical"
+                             Margin="0,0,0,10">
+                    <Label FontSize="14" 
+                           TextColor="{StaticResource Gray600}" 
+                           Text="{Static resources:ResourcesView.DistanceField}"
+                           Margin="0, 0, 10, 0"/>
+
+                    <Label FontSize="16" 
+                           TextColor="Black"
+                           Text="{Binding DistanceFromUserToPoint, StringFormat='{0:F2} km'}"/>
+                </StackLayout>
+
+                <Button Text="{Static resources:ResourcesView.OrderTitle}" 
+                        VerticalOptions="EndAndExpand"
+                        Command="{Binding AddOrderCommand}"/>
 
             </StackLayout>
-
+                
         </Border>
 
+        <Label Text="{Static resources:ResourcesView.ChooseCar}"
+               IsVisible="{Binding IsChoosCar}"
+               HorizontalOptions="Center"
+               Margin="0, 20, 0, 0"
+               FontSize="18"/>
+
+        <Button Text="{Static resources:ResourcesView.EndRoad}"
+                Style="{StaticResource BottomButton}"
+                IsVisible="{Binding IsRoadEnd}"
+                Command="{Binding EndRoadCommand}"
+                BackgroundColor="{StaticResource Primary}"/>
+        
         <Button Text="{Static resources:ResourcesView.ChoosePickup}"
                 Style="{StaticResource BottomButton}"
                 IsVisible="{Binding IsRouteNotRunning}"
                 Command="{Binding EnterAddressTappedCommand}"
+                BackgroundColor="{StaticResource Primary}"/>
+
+        <Button Text="{Static resources:ResourcesView.StartRide}"
+                Style="{StaticResource BottomButton}"
+                IsVisible="{Binding IsWaiting}"
+                Command="{Binding StartRideCommand}"
                 BackgroundColor="{StaticResource Primary}"/>
 
         <Button Text="{Static resources:ResourcesView.Stop}"

@@ -68,5 +68,23 @@ namespace Taxi_mobile.Resources.Dictionaries {
                 return ResourceManager.GetString("CurrentLocation", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to years.
+        /// </summary>
+        internal static string Years {
+            get {
+                return ResourceManager.GetString("Years", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to years and more.
+        /// </summary>
+        internal static string YearsAndMore {
+            get {
+                return ResourceManager.GetString("YearsAndMore", resourceCulture);
+            }
+        }
     }
 }

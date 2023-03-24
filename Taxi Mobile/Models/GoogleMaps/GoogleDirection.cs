@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Taxi_mobile.Models
+namespace Taxi_mobile.Models.GoogleMaps
 {
     public class GeocodedWaypoint
     {
