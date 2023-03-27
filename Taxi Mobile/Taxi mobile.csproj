@@ -49,13 +49,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AutoMapper" Version="12.0.1" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Maui.Controls.Maps" Version="7.0.59" />
 		<PackageReference Include="Mopups" Version="1.1.1" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
 		<PackageReference Include="Plugin.LocalNotification" Version="10.1.4" />
+		<PackageReference Include="Realm" Version="10.21.0" />
 	</ItemGroup>
 
 	<ItemGroup>

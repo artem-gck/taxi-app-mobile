@@ -1,7 +1,5 @@
 ﻿using Microsoft.Maui.Controls.Maps;
 using Microsoft.Maui.Maps;
-using System.Linq;
-using System.Web;
 using System.Windows.Input;
 using Taxi_mobile.Helpers;
 using Taxi_mobile.Helpers.Enams;
@@ -28,10 +26,13 @@ namespace Taxi_mobile.ViewModels
         public ICommand AddOrderCommand { get; set; }
         public ICommand StartRideCommand { get; set; }
         public ICommand EndRoadCommand { get; set; }
+        public ICommand NothingCommand => new Command(() => { });
 
+        public TimeSpan Duration { get => _duration; set => SetProperty(ref _duration, value); }
+        public string Price { get => _price; set => SetProperty(ref _price, value); }
         public double DistanceFromUserToPoint { get => _distanceFromUserToPoint; set => SetProperty(ref _distanceFromUserToPoint, value); }
         public DriverResponse SelectedDriver { get => _selectedDriver; set => SetProperty(ref _selectedDriver, value); }
-        public bool IsChoosCar { get => _isChooseCar; set => SetProperty(ref _isChooseCar, value); }
+        public bool IsChooseCar { get => _isChooseCar; set => SetProperty(ref _isChooseCar, value); }
         public bool IsRoadEnd { get => _isRoadEnd; set => SetProperty(ref _isRoadEnd, value); }
         public bool IsWaiting { get => _isWaiting; set => SetProperty(ref _isWaiting, value); }
         public bool IsRouteNotRunning { get => _isRouteNotRunning; set => SetProperty(ref _isRouteNotRunning, value); }
@@ -47,6 +48,8 @@ namespace Taxi_mobile.ViewModels
         private readonly IProcessingService _processingService;
         private readonly IMapsApiService _mapsApiService;
 
+        private TimeSpan _duration;
+        private string _price;
         private Polyline _originDirection;
         private List<Location> _originPositions;
         private double _distanceFromUserToPoint;
@@ -87,6 +90,8 @@ namespace Taxi_mobile.ViewModels
 
         private async void Initialize()
         {
+            IsBusy = true;
+
             var isGpsOn = _platformService.IsGpsOn();
 
             if (!isGpsOn)
@@ -101,6 +106,8 @@ namespace Taxi_mobile.ViewModels
             await _processingService.Initialize();
 
             await AddDrivers();
+
+            IsBusy = false;
         }
 
         private void InitializeUi(ProcessingState status)
@@ -109,7 +116,7 @@ namespace Taxi_mobile.ViewModels
             {
                 case ProcessingState.NotActive:
                     {
-                        IsChoosCar = false;
+                        IsChooseCar = false;
                         IsWaiting = false;
                         IsVisibleDriverLayout = false;
                         IsVisibleSearchLayout = true;
@@ -132,7 +139,7 @@ namespace Taxi_mobile.ViewModels
 
                 case ProcessingState.SelectingDriver:
                     {
-                        IsChoosCar = true;
+                        IsChooseCar = true;
                         IsWaiting = false;
                         IsVisibleDriverLayout = false;
                         IsVisibleSearchLayout = false;
@@ -152,7 +159,7 @@ namespace Taxi_mobile.ViewModels
 
                 case ProcessingState.StartOrder:
                     {
-                        IsChoosCar = false;
+                        IsChooseCar = false;
                         IsWaiting = false;
                         IsVisibleDriverLayout = true;
                         IsVisibleSearchLayout = false;
@@ -164,7 +171,7 @@ namespace Taxi_mobile.ViewModels
 
                 case ProcessingState.Waiting:
                     {
-                        IsChoosCar = false;
+                        IsChooseCar = false;
                         IsWaiting = false;
                         IsVisibleDriverLayout = false;
                         IsVisibleSearchLayout = false;
@@ -184,7 +191,7 @@ namespace Taxi_mobile.ViewModels
 
                 case ProcessingState.EndOfWaiting:
                     {
-                        IsChoosCar = false;
+                        IsChooseCar = false;
                         IsWaiting = true;
                         IsVisibleDriverLayout = false;
                         IsVisibleSearchLayout = false;
@@ -196,7 +203,7 @@ namespace Taxi_mobile.ViewModels
 
                 case ProcessingState.Processing:
                     {
-                        IsChoosCar = false;
+                        IsChooseCar = false;
                         IsWaiting = false;
                         IsVisibleDriverLayout = false;
                         IsVisibleSearchLayout = false;
@@ -208,7 +215,7 @@ namespace Taxi_mobile.ViewModels
 
                 case ProcessingState.EndRoad:
                     {
-                        IsChoosCar = false;
+                        IsChooseCar = false;
                         IsWaiting = false;
                         IsVisibleDriverLayout = false;
                         IsVisibleSearchLayout = false;
@@ -318,12 +325,12 @@ namespace Taxi_mobile.ViewModels
         private async Task EndRoad()
         {
             IsBusy = true;
-
+            
             var request = new FinishCarRequest()
             {
-                Price = 2,
-                Duration = 2,
-                Distance = 2
+                Price = decimal.Parse(Price),
+                Duration = Duration.Ticks,
+                Distance = DistanceFromUserToPoint
             };
 
             await _processingService.SetNotActiveState(request);
@@ -361,10 +368,14 @@ namespace Taxi_mobile.ViewModels
         {
             var positionIndex = 1;
 
+            var dateTimeOfStart = DateTime.Now;
+
             Device.StartTimer(TimeSpan.FromSeconds(1), () =>
             {
                 if (positions.Count > positionIndex)
                 {
+                    Duration.Add(TimeSpan.FromSeconds(1));
+
                     UpdatePosition(positions[positionIndex], polyline);
                     positionIndex++;
 
@@ -379,6 +390,8 @@ namespace Taxi_mobile.ViewModels
                     };
 
                     task.Wait();
+
+                    Duration = DateTime.Now - dateTimeOfStart;
 
                     return false;
                 }

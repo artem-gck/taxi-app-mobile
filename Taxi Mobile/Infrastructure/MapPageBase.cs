@@ -2,7 +2,7 @@
 
 namespace Taxi_mobile.Infrastructure
 {
-    public class MapPageBase : BindableBase, IQueryAttributable
+    public class MapPageBase : BindableBase
     {
         protected readonly IPlatformService _platformService;
 
@@ -16,8 +16,6 @@ namespace Taxi_mobile.Infrastructure
         {
             _platformService = platformService;
         }
-
-        public virtual void ApplyQueryAttributes(IDictionary<string, object> query) { }
 
         public bool CanMapPageStart()
         {

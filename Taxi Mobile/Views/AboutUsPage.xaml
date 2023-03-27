@@ -24,7 +24,8 @@
 
         <ActivityIndicator Margin="20"
                            Color="Black" 
-                           IsRunning="{Binding IsBusy}"/>
+                           IsRunning="{Binding IsBusy}"
+                           InputTransparent="True"/>
 
         <StackLayout VerticalOptions="Start"
                      Margin="40, 50, 40, 0"
@@ -61,7 +62,6 @@
         <Border Padding="0"
                 VerticalOptions="End"
                 BackgroundColor="{StaticResource Secondary}"
-                x:Name="driverMenuBorder"
                 IsVisible="{Binding IsVisibleDriverLayout}">
 
             <Border.StrokeShape>
@@ -146,18 +146,58 @@
                 
         </Border>
 
-        <Label Text="{Static resources:ResourcesView.ChooseCar}"
-               IsVisible="{Binding IsChoosCar}"
-               HorizontalOptions="Center"
-               Margin="0, 20, 0, 0"
-               FontSize="18"/>
+        <Border Margin="0, 20, 0, 0"
+                Padding="20, 10"
+                HorizontalOptions="Center"
+                VerticalOptions="Start"
+                BackgroundColor="{StaticResource Secondary}"
+                IsVisible="{Binding IsChooseCar}">
 
-        <Button Text="{Static resources:ResourcesView.EndRoad}"
-                Style="{StaticResource BottomButton}"
-                IsVisible="{Binding IsRoadEnd}"
-                Command="{Binding EndRoadCommand}"
-                BackgroundColor="{StaticResource Primary}"/>
-        
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding NothingCommand}"/>
+            </Border.GestureRecognizers>
+
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="20" />
+            </Border.StrokeShape>
+
+            <Label Text="{Static resources:ResourcesView.ChooseCar}"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   FontSize="18"/>
+
+        </Border>
+
+        <Border Padding="0"
+                VerticalOptions="End"
+                BackgroundColor="{StaticResource Secondary}"
+                HeightRequest="250"
+                IsVisible="{Binding IsRoadEnd}">
+
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="20,20,0,0" />
+            </Border.StrokeShape>
+
+            <StackLayout Padding="20">
+
+                <Entry Placeholder="Enter price"
+                       Keyboard="Numeric"
+                       Text="{Binding Price}"
+                       FontSize="16"/>
+
+                <Entry IsReadOnly="True"
+                       Text="{Binding Duration, StringFormat='{0:mm\\:ss}' }"
+                       FontSize="16"/>
+
+                <Button Text="{Static resources:ResourcesView.EndRoad}"
+                        Style="{StaticResource BottomButton}"
+                        Command="{Binding EndRoadCommand}"
+                        BackgroundColor="{StaticResource Primary}"/>
+
+            </StackLayout>
+
+        </Border>
+
         <Button Text="{Static resources:ResourcesView.ChoosePickup}"
                 Style="{StaticResource BottomButton}"
                 IsVisible="{Binding IsRouteNotRunning}"

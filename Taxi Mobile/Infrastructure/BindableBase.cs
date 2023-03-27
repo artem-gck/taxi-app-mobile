@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Taxi_mobile.Infrastructure
 {
-    public abstract class BindableBase : INotifyPropertyChanged
+    public abstract class BindableBase : INotifyPropertyChanged, IQueryAttributable
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -37,5 +37,7 @@ namespace Taxi_mobile.Infrastructure
         {
             PropertyChanged?.Invoke(this, args);
         }
+
+        public virtual void ApplyQueryAttributes(IDictionary<string, object> query) { }
     }
 }

@@ -29,6 +29,7 @@ namespace Taxi_mobile.Extensions
             builder.Services.AddSingleton<IWebService, WebService>();
             builder.Services.AddSingleton<IProcessingService, ProcessingService>();
             builder.Services.AddSingleton<ILocalNotificationService, LocalNotificationService>();
+            builder.Services.AddSingleton<IDbService, DbService>();
 
             return builder;
         }

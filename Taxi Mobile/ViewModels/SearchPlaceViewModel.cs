@@ -4,6 +4,7 @@ using Taxi_mobile.Helpers;
 using Taxi_mobile.Infrastructure;
 using Taxi_mobile.Interfaces;
 using Taxi_mobile.Interfaces.Platforms;
+using Taxi_mobile.Models.Db;
 using Taxi_mobile.Models.GoogleMaps;
 using Taxi_mobile.Resources.Dictionaries;
 
@@ -14,12 +15,13 @@ namespace Taxi_mobile.ViewModels
         private readonly IMapsApiService _mapsApiService;
         private readonly IGeolocationService _geolocationService;
         private readonly IPopupService _popupService;
+        private readonly IDbService _dbService;
 
         private string _pickupText;
         private string _originText;
-        private bool _isShowRecentPlaces;
+        private bool _isShowRecentPlaces = true;
         private bool _isPickupFocused = true;
-        private bool _isChooseLocation = true;
+        private bool _isChooseLocation = false;
         private GooglePlaceAutoCompletePrediction _placeSelected;
         private Location _origin;
         private Location _destination;
@@ -40,7 +42,7 @@ namespace Taxi_mobile.ViewModels
         {
             get => _pickupText;
             set => SetProperty(ref _pickupText, value, () => {
-                if (!string.IsNullOrEmpty(_pickupText) && _isChooseLocation)
+                if (!string.IsNullOrEmpty(_pickupText) && value != ResourcesViewModel.CurrentLocation)
                 {
                     _isPickupFocused = true;
                     GetPlacesByName(_pickupText);
@@ -69,16 +71,29 @@ namespace Taxi_mobile.ViewModels
             });
         }
 
-        public SearchPlaceViewModel(IMapsApiService mapsApiService, IGeolocationService geolocationService, IPopupService popupService) 
+        public SearchPlaceViewModel(IMapsApiService mapsApiService, IGeolocationService geolocationService, IPopupService popupService, IDbService dbService) 
         {
             _mapsApiService = mapsApiService;
             _geolocationService = geolocationService;
             _popupService = popupService;
+            _dbService = dbService;
 
             Places = new ();
             RecentPlaces = new ();
 
             ChooseMyLocationCommand = new Command(async () => await ChooseCurentLocation());
+        }
+
+        public override async void ApplyQueryAttributes(IDictionary<string, object> query) 
+        {
+            IsShowRecentPlaces = true;
+
+            var recentPlaceEntities = await _dbService.GetTopByDateAsync(AppConstants.CountOfRecentPlaces);
+
+            foreach (var place in recentPlaceEntities)
+            {
+                RecentPlaces.Add(MapEntityToPrediction(place));
+            }
         }
 
         private async Task ChooseCurentLocation()
@@ -168,8 +183,11 @@ namespace Taxi_mobile.ViewModels
                 }
                 else
                 {
+                    OriginText = place.Name;
+
                     _destination = new Location(place.Latitude, place.Longitude);
-                    RecentPlaces.Add(placeA);
+
+                    await _dbService.AddOrUpdateAsync(MapPredictionToEntity(placeA));
 
                     if (_origin.Latitude == _destination.Latitude && _origin.Longitude == _destination.Longitude)
                     {
@@ -191,6 +209,8 @@ namespace Taxi_mobile.ViewModels
                         CleanFields();
                     }
                 }
+
+                PlaceSelected = null;
             }
         }
 
@@ -201,5 +221,33 @@ namespace Taxi_mobile.ViewModels
             IsShowRecentPlaces = true;
             PlaceSelected = null;
         }
+
+        private GooglePlaceAutoCompletePrediction MapEntityToPrediction(PlaceAutoCompletePredictionEntity entity)
+            => new GooglePlaceAutoCompletePrediction()
+            {
+                Description = entity.Description,
+                Id = entity.GoogleId,
+                PlaceId = entity.PlaceId,
+                Reference = entity.Reference,
+                StructuredFormatting = new StructuredFormatting()
+                {
+                    MainText = entity.StructuredFormatting.MainText,
+                    SecondaryText = entity.StructuredFormatting.SecondaryText,
+                }
+            };
+
+        private PlaceAutoCompletePredictionEntity MapPredictionToEntity(GooglePlaceAutoCompletePrediction prediction)
+            => new PlaceAutoCompletePredictionEntity()
+            {
+                Description = prediction.Description,
+                GoogleId = prediction.Id,
+                PlaceId = prediction.PlaceId,
+                Reference = prediction.Reference,
+                StructuredFormatting = new StructuredFormattingEntity()
+                {
+                    MainText = prediction.StructuredFormatting.MainText,
+                    SecondaryText = prediction.StructuredFormatting.SecondaryText,
+                }
+            };
     }
 }

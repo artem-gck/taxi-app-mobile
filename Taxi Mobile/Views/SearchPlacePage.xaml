@@ -22,14 +22,10 @@
         </Grid.ColumnDefinitions>
 
         <StackLayout Grid.Row="0"  
-                     Padding="10"
+                     Padding="30, 10, 10, 10"
                      BackgroundColor="LightGray"
                      Orientation="Horizontal">
             
-            <Image Source="ic_search"
-                   HeightRequest="20"
-                   WidthRequest="20"/>
-
             <Entry Placeholder="{Static resources:ResourcesView.EnterPickupPlaceholder}"
                    Text="{Binding PickupText}"
                    FontSize="18"
@@ -47,13 +43,9 @@
         </StackLayout>
 
         <StackLayout Grid.Row="1"
-                     Padding="10"
+                     Padding="30, 10, 10, 10"
                      BackgroundColor="LightGray"
                      Orientation="Horizontal">
-            
-            <Image Source="ic_search"
-                   HeightRequest="20"
-                   WidthRequest="20"/>
             
             <Entry Placeholder="Where to?" 
                    Text="{Binding OriginText}"
@@ -70,94 +62,62 @@
                   BackgroundColor="Transparent"
                   Grid.Row="2"
                   Footer=""
+                  SelectionMode="Single"
                   SelectedItem="{Binding PlaceSelected, Mode=TwoWay}"
-                  ItemsSource="{Binding Places}"
                   HasUnevenRows="true"
                   SeparatorColor="{StaticResource Gray400}">
-            
+
             <ListView.Triggers>
-                
+
                 <DataTrigger TargetType="ListView"
                              Binding="{Binding IsShowRecentPlaces}"
                              Value="True">
-                    
+
                     <Setter Property="ItemsSource" 
                             Value="{Binding RecentPlaces}" />
-                    
+
                 </DataTrigger>
-                
+
                 <DataTrigger TargetType="ListView"
                              Binding="{Binding IsShowRecentPlaces}"
                              Value="False">
-                    
+
                     <Setter Property="ItemsSource" 
                             Value="{Binding Places}" />
-                    
+
                 </DataTrigger>
-                
+
             </ListView.Triggers>
-            
-            <ListView.Header>
-                
-                <StackLayout  IsVisible="{Binding IsShowRecentPlaces}">
-                    
-                    <Label LineBreakMode="WordWrap"
-                           FontAttributes="Bold"
-                           Margin="20,10"
-                           Text="{Static resources:ResourcesView.HistoryTitle}"/>
-                    
-                </StackLayout>
-                
-            </ListView.Header>
-            
+
             <ListView.ItemTemplate>
-                
+
                 <DataTemplate>
-                    
+
                     <ViewCell>
-                        
-                        <Grid Padding="15"
-                              RowSpacing="2"
-                              ColumnSpacing="15">
 
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <Image Source="ic_location"
-                                   HeightRequest="20"
-                                   WidthRequest="20"
-                                   VerticalOptions="Start"
-                                   Grid.Row="0"
-                                   Grid.Column="0"
-                                   Grid.RowSpan="2"/>
+                        <StackLayout Padding="30, 5, 0, 5"
+                                     Margin="0" 
+                                     BackgroundColor="{StaticResource White}">
 
                             <Label LineBreakMode="MiddleTruncation"
-                                   Text="{Binding StructuredFormatting.MainText}"
-                                   Grid.Row="0"
-                                   Grid.Column="1"
+                                   Text="{Binding Path=StructuredFormatting.MainText}"
+                                   Margin="0, 0, 0, 2"
+                                   FontSize="16"
                                    TextColor="{StaticResource Black}"/>
 
                             <Label LineBreakMode="MiddleTruncation"
-                                   Text="{Binding StructuredFormatting.SecondaryText}" 
-                                   TextColor="{StaticResource Gray400}" 
-                                   Grid.Row="1"
-                                   Grid.Column="1"/>
-                            
-                        </Grid>
-                        
+                                   Text="{Binding Path=StructuredFormatting.SecondaryText}" 
+                                   FontSize="16"
+                                   TextColor="{StaticResource Gray500}" />
+
+                        </StackLayout>
+
                     </ViewCell>
-                    
+
                 </DataTemplate>
-                
+
             </ListView.ItemTemplate>
-            
+
         </ListView>
         
     </Grid>
