@@ -9,6 +9,8 @@ namespace Taxi_mobile.Services
 {
     public class WebService : IWebService
     {
+        #region private_fields
+
         private const HttpMethodType GET = HttpMethodType.Get;
         private const HttpMethodType PUT = HttpMethodType.Put;
         private const HttpMethodType POST = HttpMethodType.Post;
@@ -22,6 +24,10 @@ namespace Taxi_mobile.Services
             Delete
         }
 
+        #endregion
+
+        #region get
+
         public async Task<GetAllDriversResponse> GetAllDrivers(string status)
         {
             var url = ApiRouteGenerator.DriversService.GetAllDriversPath(status);
@@ -34,12 +40,20 @@ namespace Taxi_mobile.Services
             return await CallApiJson<GetUserStateResponse>(url);
         }
 
+        #endregion
+
+        #region post
+
         public async Task<AddOrderResponse> PostAddOrder(AddOrderRequest orderRequest)
         {
             var url = ApiRouteGenerator.DriversService.GetAddOrderPath();
             var content = JsonContent(JsonConvert.SerializeObject(orderRequest));
             return await CallApiJson<AddOrderResponse>(url, HttpMethodType.Post, content);
         }
+
+        #endregion
+
+        #region put
 
         public async Task<ProcessCarResponse> PutProcessOrder(Guid orderId)
         {
@@ -53,6 +67,14 @@ namespace Taxi_mobile.Services
             var content = JsonContent(JsonConvert.SerializeObject(orderRequest));
             return await CallApiJson<FinishCarResponse>(url, HttpMethodType.Put, content);
         }
+
+        #endregion
+
+        #region delete
+
+        #endregion
+
+        #region private
 
         private async Task<T> CallApiJson<T>(string url, HttpMethodType httpMethod = HttpMethodType.Get, StringContent content = null)
         {
@@ -98,5 +120,7 @@ namespace Taxi_mobile.Services
         {
             return new StringContent(json, Encoding.UTF8, "application/json");
         }
+
+        #endregion
     }
 }

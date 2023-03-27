@@ -7,11 +7,17 @@ namespace Taxi_mobile.Services
 {
     public class ProcessingService : IProcessingService
     {
+        #region private_fields
+
         private readonly IWebService _webService;
         private readonly ILocalNotificationService _localNotificationService;
 
         private ProcessingState _currentState = ProcessingState.NotActive;
         private Guid _orderId;
+
+        #endregion
+
+        #region public_fields
 
         public event Action<ProcessingState> OnCurrentStateChanged;
         public ProcessingState CurrentState 
@@ -24,11 +30,15 @@ namespace Taxi_mobile.Services
             }
         }
 
+        #endregion
+
         public ProcessingService(IWebService webService, ILocalNotificationService localNotificationService)
         {
             _webService = webService;
             _localNotificationService = localNotificationService;
         }
+
+        #region public
 
         public async Task Initialize()
         {
@@ -116,5 +126,7 @@ namespace Taxi_mobile.Services
                 CurrentState = ProcessingState.EndRoad;
             }
         }
+
+        #endregion
     }
 }

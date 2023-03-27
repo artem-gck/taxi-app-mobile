@@ -36,11 +36,11 @@ namespace Taxi_mobile.Extensions
 
         public static MauiAppBuilder ConfigurePages(this MauiAppBuilder builder)
         {
-            builder.Services.AddSingleton<AboutUsViewModel>();
+            builder.Services.AddSingleton<MapViewModel>();
             builder.Services.AddTransient<SearchPlaceViewModel>();
             builder.Services.AddSingleton<InfoPopupViewModel>();
 
-            builder.Services.AddSingleton<AboutUsPage>();
+            builder.Services.AddSingleton<MapPage>();
             builder.Services.AddTransient<SearchPlacePage>();
             builder.Services.AddSingleton<InfoPopup>();
 

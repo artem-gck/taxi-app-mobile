@@ -7,14 +7,20 @@ namespace Taxi_mobile.Services
 {
     public class PopupService : IPopupService
     {
+        #region private_fields
+
         private readonly IPopupNavigation _popupNavigation;
         private readonly IServiceProvider _serviceProvider;
+
+        #endregion
 
         public PopupService(IPopupNavigation popupNavigation, IServiceProvider serviceProvider) 
         {
             _popupNavigation = popupNavigation;
             _serviceProvider = serviceProvider;
-        }   
+        }
+
+        #region public
 
         public async Task<string> ShowInfoPopup(string title, string message, bool isPositive = false)
         {
@@ -31,5 +37,7 @@ namespace Taxi_mobile.Services
 
             return result;
         }
+
+        #endregion
     }
 }

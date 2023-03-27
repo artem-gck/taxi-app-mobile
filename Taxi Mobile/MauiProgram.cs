@@ -5,6 +5,7 @@ using Taxi_mobile.Views.Controls;
 using Taxi_mobile.Views.Handlers;
 using Taxi_mobile.Extensions;
 using Plugin.LocalNotification;
+using Taxi_mobile.ViewModels;
 
 namespace Taxi_mobile;
 
@@ -41,7 +42,7 @@ public static class MauiProgram
 
     private static void ConfigureNavigation()
     {
-        Routing.RegisterRoute("AboutUsPage", typeof(AboutUsPage));
+        Routing.RegisterRoute("MapPage", typeof(MapPage));
         Routing.RegisterRoute("SearchPlacePage", typeof(SearchPlacePage));
     }
 }

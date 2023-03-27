@@ -5,6 +5,8 @@ namespace Taxi_mobile.Views;
 
 public partial class SearchPlacePage : ContentPage
 {
+    #region bindable_properties
+
     public static readonly BindableProperty FocusOriginCommandProperty =
            BindableProperty.Create(nameof(FocusOriginCommand), typeof(ICommand), typeof(SearchPlacePage), null, BindingMode.TwoWay);
 
@@ -13,6 +15,8 @@ public partial class SearchPlacePage : ContentPage
         get { return (ICommand)GetValue(FocusOriginCommandProperty); }
         set { SetValue(FocusOriginCommandProperty, value); }
     }
+
+    #endregion
 
     public SearchPlacePage(SearchPlaceViewModel searchPlaceViewModel)
     {

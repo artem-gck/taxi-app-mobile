@@ -9,8 +9,12 @@ namespace Taxi_mobile.Services
 {
     public class DbService : IDbService
     {
+        #region private_fields
+
         private readonly RealmConfiguration _realmConfiguration;
         private readonly SHA512 _sha512;
+
+        #endregion
 
         public DbService()
         {
@@ -28,6 +32,8 @@ namespace Taxi_mobile.Services
                 }
             };
         }
+
+        #region public
 
         public async Task AddOrUpdateAsync<T>(T entity) where T : RealmObject
         {
@@ -74,6 +80,10 @@ namespace Taxi_mobile.Services
             );
         }
 
+        #endregion
+
+        #region private
+
         private async Task<Realm> GetRealmInstanceAsync()
         {
             return await Realm.GetInstanceAsync(_realmConfiguration);
@@ -93,5 +103,7 @@ namespace Taxi_mobile.Services
 
             throw new InvalidOperationException("No instalation key in preferences");
         }
+
+        #endregion
     }
 }

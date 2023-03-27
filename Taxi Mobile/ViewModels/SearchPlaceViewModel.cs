@@ -12,6 +12,8 @@ namespace Taxi_mobile.ViewModels
 {
     public class SearchPlaceViewModel : BindableBase
     {
+        #region private_fields
+
         private readonly IMapsApiService _mapsApiService;
         private readonly IGeolocationService _geolocationService;
         private readonly IPopupService _popupService;
@@ -27,6 +29,9 @@ namespace Taxi_mobile.ViewModels
         private Location _destination;
         private List<Location> positions;
 
+        #endregion
+
+        #region public_fields
 
         public ICommand FocusOriginCommand { get; set; }
         public ICommand ChooseMyLocationCommand { get; set; }
@@ -71,6 +76,8 @@ namespace Taxi_mobile.ViewModels
             });
         }
 
+        #endregion
+
         public SearchPlaceViewModel(IMapsApiService mapsApiService, IGeolocationService geolocationService, IPopupService popupService, IDbService dbService) 
         {
             _mapsApiService = mapsApiService;
@@ -84,6 +91,8 @@ namespace Taxi_mobile.ViewModels
             ChooseMyLocationCommand = new Command(async () => await ChooseCurentLocation());
         }
 
+        #region public
+
         public override async void ApplyQueryAttributes(IDictionary<string, object> query) 
         {
             IsShowRecentPlaces = true;
@@ -95,6 +104,10 @@ namespace Taxi_mobile.ViewModels
                 RecentPlaces.Add(MapEntityToPrediction(place));
             }
         }
+
+        #endregion
+
+        #region private
 
         private async Task ChooseCurentLocation()
         {
@@ -116,31 +129,7 @@ namespace Taxi_mobile.ViewModels
         {
             var positionIndex = 1;
             var googleDirection = await _mapsApiService.GetDirections(_origin, _destination);
-            if (googleDirection.Routes != null && googleDirection.Routes.Count > 0)
-            {
-                positions = (Enumerable.ToList(PolylineHelper.Decode(googleDirection.Routes.First().OverviewPolyline.Points)));
-
-                //Location tracking simulation
-                //Device.StartTimer(TimeSpan.FromSeconds(1), () =>
-                //{
-                //    if (positions.Count > positionIndex && _hasRouteRunning)
-                //    {
-                //        UpdatePosition(positions[positionIndex]);
-                //        //UpdatePositionCommand.Execute(positions[positionIndex]);
-                //        positionIndex++;
-                //        return true;
-                //    }
-                //    else
-                //    {
-                //        return false;
-                //    }
-                //});
-            }
-            else
-            {
-                //await _alertService.DisplayAlert(":(", "No route found", "Ok");
-            }
-
+            positions = (Enumerable.ToList(PolylineHelper.Decode(googleDirection.Routes.First().OverviewPolyline.Points)));
         }
 
         private async void GetPlacesByName(string placeText)
@@ -189,25 +178,18 @@ namespace Taxi_mobile.ViewModels
 
                     await _dbService.AddOrUpdateAsync(MapPredictionToEntity(placeA));
 
-                    if (_origin.Latitude == _destination.Latitude && _origin.Longitude == _destination.Longitude)
+                    await LoadRoute();
+
+                    var navigationParameter = new Dictionary<string, object>
                     {
-                        //await _alertService.DisplayAlert("Error", "Origin route should be different than destination route", "Ok");
-                    }
-                    else
-                    {
-                        await LoadRoute();
+                        { "positions", positions },
+                        { "origin", _origin },
+                        { "destination", _destination }
+                    };
 
-                        var navigationParameter = new Dictionary<string, object>
-                        {
-                            { "positions", positions },
-                            { "origin", _origin },
-                            { "destination", _destination }
-                        };
+                    await Shell.Current.GoToAsync($"..", navigationParameter);
 
-                        await Shell.Current.GoToAsync($"..", navigationParameter);
-
-                        CleanFields();
-                    }
+                    CleanFields();
                 }
 
                 PlaceSelected = null;
@@ -249,5 +231,7 @@ namespace Taxi_mobile.ViewModels
                     SecondaryText = prediction.StructuredFormatting.SecondaryText,
                 }
             };
+
+        #endregion
     }
 }

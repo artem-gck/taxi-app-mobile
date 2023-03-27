@@ -6,10 +6,14 @@ namespace Taxi_mobile.Services
 {
     public class LocalNotificationService : ILocalNotificationService
     {
+        #region private_fields
+
         private readonly INotificationService _notificationService;
         private readonly ILogger<LocalNotificationService> _logger;
 
-        private List<int> _pushedNotifications = new List<int>(); 
+        private List<int> _pushedNotifications = new List<int>();
+
+        #endregion
 
         public LocalNotificationService(INotificationService notificationService, ILogger<LocalNotificationService> logger) 
         {
@@ -19,17 +23,7 @@ namespace Taxi_mobile.Services
             notificationService.NotificationActionTapped += NotificationService_NotificationActionTapped;
         }
 
-        private void NotificationService_NotificationActionTapped(Plugin.LocalNotification.EventArgs.NotificationActionEventArgs e)
-        {
-            if (e.IsDismissed)
-            {
-
-            }
-            else if (e.IsTapped)
-            {
-
-            }
-        }
+        #region public
 
         public async Task SendInfoNotification(string title, string subTitle)
         {
@@ -44,10 +38,6 @@ namespace Taxi_mobile.Services
                     Subtitle = subTitle,
                     BadgeNumber = 42,
                     CategoryType = NotificationCategoryType.Status,
-                    //Schedule = new NotificationRequestSchedule
-                    //{
-                    //    NotifyTime = DateTime.Now,
-                    //}
                 };
 
                 await _notificationService.Show(request);
@@ -59,6 +49,10 @@ namespace Taxi_mobile.Services
             _notificationService.CancelAll();
             _pushedNotifications.Clear();
         }
+
+        #endregion
+
+        #region private
 
         private int GenerateNotificationId()
         {
@@ -72,5 +66,19 @@ namespace Taxi_mobile.Services
 
             return id;
         }
+
+        private void NotificationService_NotificationActionTapped(Plugin.LocalNotification.EventArgs.NotificationActionEventArgs e)
+        {
+            if (e.IsDismissed)
+            {
+
+            }
+            else if (e.IsTapped)
+            {
+
+            }
+        }
+
+        #endregion
     }
 }

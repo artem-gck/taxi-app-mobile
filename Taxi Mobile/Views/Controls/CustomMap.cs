@@ -7,7 +7,7 @@ namespace Taxi_mobile.Views.Controls
     public class CustomMap : Microsoft.Maui.Controls.Maps.Map
     {
         public static readonly BindableProperty MoveToRegionCommandProperty =
-            BindableProperty.Create(nameof(MoveToRegionCommand), typeof(ICommand), typeof(AboutUsPage), null, BindingMode.TwoWay);
+            BindableProperty.Create(nameof(MoveToRegionCommand), typeof(ICommand), typeof(MapPage), null, BindingMode.TwoWay);
 
         public ICommand MoveToRegionCommand
         {
@@ -16,7 +16,7 @@ namespace Taxi_mobile.Views.Controls
         }
 
         public static readonly BindableProperty MapElementsProperty =
-            BindableProperty.Create(nameof(MapElements), typeof(IList<MapElement>), typeof(AboutUsPage), null, BindingMode.TwoWay);
+            BindableProperty.Create(nameof(MapElements), typeof(IList<MapElement>), typeof(MapPage), null, BindingMode.TwoWay);
 
         public IList<MapElement> Elements
         {
@@ -25,7 +25,7 @@ namespace Taxi_mobile.Views.Controls
         }
 
         public static readonly BindableProperty PinsProperty =
-            BindableProperty.Create(nameof(MapElements), typeof(IList<Pin>), typeof(AboutUsPage), null, BindingMode.TwoWay);
+            BindableProperty.Create(nameof(MapElements), typeof(IList<Pin>), typeof(MapPage), null, BindingMode.TwoWay);
 
         public IList<Pin> Points
         {

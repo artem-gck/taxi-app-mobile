@@ -6,14 +6,9 @@
     xmlns:local="clr-namespace:Taxi_mobile.Views"
     Shell.FlyoutBehavior="Flyout">
 
-    <!--<ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MapPage}"
-        Route="MapPage" />-->
-
     <ShellContent
         Title="About us"
-        ContentTemplate="{DataTemplate local:AboutUsPage}"
-        Route="AboutUsPage" />
+        ContentTemplate="{DataTemplate local:MapPage}"
+        Route="MapPage" />
 
 </Shell>

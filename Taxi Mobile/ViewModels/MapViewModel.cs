@@ -12,8 +12,40 @@ using Polyline = Microsoft.Maui.Controls.Maps.Polyline;
 
 namespace Taxi_mobile.ViewModels
 {
-    public class AboutUsViewModel : MapPageBase
+    public class MapViewModel : MapPageBase
     {
+        #region private_fields
+
+        private readonly IGeolocationService _geolocationService;
+        private readonly IPopupService _popupService;
+        private readonly IWebService _webService;
+        private readonly IProcessingService _processingService;
+        private readonly IMapsApiService _mapsApiService;
+
+        private TimeSpan _duration;
+        private string _price;
+        private Polyline _originDirection;
+        private List<Location> _originPositions;
+        private double _distanceFromUserToPoint;
+        private Guid _originPinId;
+        private Guid _destinationPinId;
+        private Location _origin;
+        private Location _destination;
+        private DriverResponse _selectedDriver;
+        private bool _isChooseCar;
+        private bool _isRoadEnd;
+        private bool _isWaiting;
+        private bool _isRouteNotRunning;
+        private bool _isVisibleDriverLayout;
+        private bool _isVisibleSearchLayout;
+        private bool _isVisibleStopRouteButton;
+        private IList<MapElement> _mapElements;
+        private IList<Pin> _pins;
+
+        #endregion
+
+        #region public_fields
+
         public ICommand StopRouteCommand { get; set; }
         public ICommand EnterAddressTappedCommand => new Command(async () =>
         {
@@ -42,33 +74,9 @@ namespace Taxi_mobile.ViewModels
         public IList<MapElement> MapElements { get => _mapElements; set => SetProperty(ref _mapElements, value); }
         public IList<Pin> Pins { get => _pins; set => SetProperty(ref _pins, value); }
 
-        private readonly IGeolocationService _geolocationService;
-        private readonly IPopupService _popupService;
-        private readonly IWebService _webService;
-        private readonly IProcessingService _processingService;
-        private readonly IMapsApiService _mapsApiService;
+        #endregion
 
-        private TimeSpan _duration;
-        private string _price;
-        private Polyline _originDirection;
-        private List<Location> _originPositions;
-        private double _distanceFromUserToPoint;
-        private Guid _originPinId;
-        private Guid _destinationPinId;
-        private Location _origin;
-        private Location _destination;
-        private DriverResponse _selectedDriver;
-        private bool _isChooseCar;
-        private bool _isRoadEnd;
-        private bool _isWaiting;
-        private bool _isRouteNotRunning;
-        private bool _isVisibleDriverLayout;
-        private bool _isVisibleSearchLayout;
-        private bool _isVisibleStopRouteButton;
-        private IList<MapElement> _mapElements;
-        private IList<Pin> _pins;
-        
-        public AboutUsViewModel(IGeolocationService geolocationService, IPlatformService platformService, IPopupService popupService, IWebService webService, IProcessingService processingService, IMapsApiService mapsApiService)
+        public MapViewModel(IGeolocationService geolocationService, IPlatformService platformService, IPopupService popupService, IWebService webService, IProcessingService processingService, IMapsApiService mapsApiService)
             : base(platformService)
         {
             _geolocationService = geolocationService;
@@ -87,6 +95,30 @@ namespace Taxi_mobile.ViewModels
 
             Initialize();
         }
+
+        #region public
+
+        public override void ApplyQueryAttributes(IDictionary<string, object> query)
+        {
+            _processingService.OnCurrentStateChanged += InitializeUi;
+
+            if (query != null)
+            {
+                _originPositions = query["positions"] as List<Location>;
+                _origin = query["origin"] as Location;
+                _destination = query["destination"] as Location;
+
+                CalculateRoute(_originPositions);
+
+                DistanceFromUserToPoint = PolylineHelper.ColculateDistance(_originPositions, DistanceUnits.Kilometers);
+
+                _processingService.SetSelectingDriverState();
+            }
+        }
+
+        #endregion
+
+        #region private
 
         private async void Initialize()
         {
@@ -226,25 +258,6 @@ namespace Taxi_mobile.ViewModels
                     break;
             }
         }
-
-        public override void ApplyQueryAttributes(IDictionary<string, object> query)
-        {
-            _processingService.OnCurrentStateChanged += InitializeUi;
-
-            if (query != null)
-            {
-                _originPositions = query["positions"] as List<Location>;
-                _origin = query["origin"] as Location;
-                _destination = query["destination"] as Location;
-
-                CalculateRoute(_originPositions);
-
-                DistanceFromUserToPoint = PolylineHelper.ColculateDistance(_originPositions, DistanceUnits.Kilometers);
-
-                _processingService.SetSelectingDriverState();
-            }
-        }
-
 
         private async void AddOrder()
         {
@@ -512,5 +525,7 @@ namespace Taxi_mobile.ViewModels
                 });
             }
         }
+
+        #endregion
     }
 }

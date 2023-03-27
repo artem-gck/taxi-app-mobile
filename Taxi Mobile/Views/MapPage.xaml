@@ -5,7 +5,7 @@
              xmlns:beh="clr-namespace:Taxi_mobile.Behaviors"
              xmlns:conv="clr-namespace:Taxi_mobile.Helpers.Converters"
              xmlns:resources="clr-namespace:Taxi_mobile.Resources.Dictionaries"
-             x:Class="Taxi_mobile.Views.AboutUsPage"
+             x:Class="Taxi_mobile.Views.MapPage"
              Title="AboutUsPage"
              Shell.NavBarIsVisible="False">
 
@@ -171,27 +171,28 @@
         <Border Padding="0"
                 VerticalOptions="End"
                 BackgroundColor="{StaticResource Secondary}"
-                HeightRequest="250"
+                HeightRequest="220"
                 IsVisible="{Binding IsRoadEnd}">
 
             <Border.StrokeShape>
                 <RoundRectangle CornerRadius="20,20,0,0" />
             </Border.StrokeShape>
 
-            <StackLayout Padding="20">
+            <StackLayout Padding="30, 20">
 
                 <Entry Placeholder="Enter price"
                        Keyboard="Numeric"
                        Text="{Binding Price}"
-                       FontSize="16"/>
+                       FontSize="18"/>
 
                 <Entry IsReadOnly="True"
                        Text="{Binding Duration, StringFormat='{0:mm\\:ss}' }"
-                       FontSize="16"/>
+                       FontSize="18"/>
 
                 <Button Text="{Static resources:ResourcesView.EndRoad}"
                         Style="{StaticResource BottomButton}"
                         Command="{Binding EndRoadCommand}"
+                        Margin="0"
                         BackgroundColor="{StaticResource Primary}"/>
 
             </StackLayout>
